@@ -1,0 +1,230 @@
+---
+title: "DanielsAms394Hw1"
+author: "William Daniels"
+date: "2024-05-31"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework 1
+
+Authored by William Daniels, on May 31, 2024 for AMS 392: Statistical laboratory
+
+## Part 1
+
+### Problem 1
+
+Consider the following heights: 1.45, 2.22, 1.65, 1.25, 1.58, 1.87, 1.93, 1.42, 1.26, 1.57, 1.52, 1.95. Use R script to answer the following questions.
+
+-   Assign all these heights as a vector height
+
+-   Compute the mean and standard deviation of height
+
+-   What is the length of "height?"
+
+-   How many heights are less than 1.65?
+
+-   Show if each height is larger than 1.60 and smaller than 1.75.
+
+#### Code
+
+```{r}
+height <- c(1.45, 2.22, 1.65, 1.25, 1.58, 1.87, 1.93, 1.42, 1.26, 1.57, 1.52, 1.95)
+
+mean(height)
+sd(height)
+
+length(height)
+
+sum(height<1.65)
+
+height>1.6 & height<1.75
+sum(height>1.6 & height<1.75)
+```
+
+#### Solutions
+
+-   The mean height is 1.639 and the standard deviation is 0.297
+
+-   There are 12 heights
+
+-   7 heights are less than 1.65
+
+-   There is 1 height between 1.6 and 1.75, and it is the third height in the list
+
+### Problem 2
+
+Using the following script, we can generate a 3x4 matrix: `tmp <- matrix(rnorm(12), 3, 4)`. Answer the following:
+
+-   Compute the sum of the second and third rows (The expected result should be the sum of each column). (by sum function)
+
+-   Compute the product of second and fourth columns. (The expected result should be the product of each column). (by prod function)
+
+-   Show the dimension of the matrix.
+
+-   Use ”cat” function to output elements in the second row that are less than 0.2. (use the help document to check the cat function)
+
+#### Code
+
+```{r}
+m <- matrix(rnorm(12), 3, 4)
+m
+
+sum(m[2,])
+sum(m[3,])
+
+prod(m[,2])
+prod(m[,4])
+
+dim(m)
+
+cat(m[2,][m[2,]<0.2], sep=", ")
+```
+
+#### Solutions
+
+-   The sum of the second row is -0.169 and the sum of the third row is 4.592
+
+-   The product of the second column is -0.521 and the product of the fourth column is 0.111
+
+-   The dimension on the matrix is 3, 4
+
+-   Elements in the second row less than 0.2 are: 0.091, -0.598, and 0.107
+
+## Part 2
+
+### Problem 1
+
+-   Calculate the probability of $x^2 < 8$, if $x$ follows a normal distribution with mean $1$ and standard deviation $2$.
+
+-   Calculate the probability of getting 3 out of 8 successes in a binomial distribution with probability 0.5
+
+-   Calculate the probability of $x < 2$, if $x$ follows a chi-square distribution with degree of freedom 7
+
+-   Calculate the probability of $5 < x < 7$, if $x$ follows an exponential distribution with rate 4
+
+-   Calculate the probability of $x=7$, if $x$ follows a poisson distribution with mean 5
+
+#### Code
+
+```{r}
+trials <- 1000000
+sum(rnorm(trials, 1, 2)^2 < 8) / trials
+
+dbinom(3, 8, 0.5)
+
+pchisq(2, 7)
+
+pexp(7, 4) - pexp(5, 4)
+
+dpois(7, 5)
+```
+
+#### Solutions
+
+-   0.792
+
+-   0.219
+
+-   0.040
+
+-   0.000
+
+-   0.104
+
+### Problem 2
+
+-   Check the normality of the variable "std.wright" in "wright" data set in package "ISwR" with QQ plot or histogram
+
+-   Test if the mean of "std.wright" is greater than 400 with significance level $\alpha = 0.05$
+
+#### Code
+
+```{r}
+#install.packages("ISwR")
+library("ISwR")
+qqnorm(wright$std.wright)
+qqline(wright$std.wright)
+
+t.test(wright$std.wright, alternative="greater", mu=400, conf.level=0.95)
+```
+
+#### Solutions
+
+-   The QQ plot indicates that the bulk of the data is roughly normal, but the "tails" of the distribution are likely "heavier"
+-   If we allow the assumption that the data is normal, we can use a t-test since the standard deviation of the population is unknown. Since the 0.95 confidence interval exceeds 400, we conclude that the true mean is greater than 400
+
+## Part 3
+
+### Problem 1
+
+Calculate the probability of each of the following events:
+
+-   A normally distributed variable with mean 10 and standard deviation 3 is less than 10
+
+-   $X<4$ in a chi-square distribution with 6 degrees of freedom
+
+-   Getting 4 out of 6 successes in a binomial distribution with probability 0.85
+
+-   $X=5$ in a Poisson distribution with $\lambda$ is 10
+
+#### Code
+
+```{r}
+pnorm(10, mean=10, sd=3)
+
+pchisq(4, 6)
+
+dbinom(4, 6, 0.85)
+
+dpois(5, 10)
+```
+
+#### Solutions
+
+-   0.500
+
+-   0.323
+
+-   0.176
+
+-   0.038
+
+### Problem 2
+
+Generate 1,000 exponentially distributed random variables with rate 5, and plot their empirical distribution function
+
+#### Code
+
+```{r}
+samples <- rexp(1000, 5)
+hist(samples, freq=FALSE)
+```
+
+#### Solution
+
+See above plot.
+
+### Exercise 0
+
+Generate 1000 samples from a normal distribution with mean 2 and standard deviation 3, and approximate the 25th, 50th, and 75th percentile.
+
+#### Code
+
+```{r}
+samples <- rnorm(1000, 2, 3)
+boxplot(samples)
+bpstats <- boxplot.stats(samples)
+text(x = 1.36, labels = bpstats$stats, y = bpstats$stats)
+
+quantile(samples, probs = c(0.25, 0.5, 0.75))
+```
+
+#### Solutions
+
+Excluding outliers, $Q_1 = -0.034$, $Q_2 = 1.994$, and $Q_3 = 4.087$. Including outliers, $Q_1 = -0.031$, $Q_2 = 1.994$, and $Q_3 = 4.087$
