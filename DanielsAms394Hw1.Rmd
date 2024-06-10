@@ -3,8 +3,8 @@ title: "DanielsAms394Hw1"
 author: "William Daniels"
 date: "2024-05-31"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -203,7 +203,7 @@ Generate 1,000 exponentially distributed random variables with rate 5, and plot 
 
 ```{r}
 samples <- rexp(1000, 5)
-hist(samples, freq=FALSE)
+plot(ecdf(samples), main="Empriric distribution of exponential samples")
 ```
 
 #### Solution
