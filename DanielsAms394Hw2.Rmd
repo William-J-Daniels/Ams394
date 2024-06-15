@@ -1,0 +1,163 @@
+---
+title: "DanielsAms394Hw2"
+author: "William Daniels"
+date: "2024-06-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework 2
+
+Will Daniels, June 14, 2024. AMS 392: Statistical laboratory
+
+## Part 1
+
+Over then past 5 years, the mean time for a warehouse to fill a buyers order has been 25 minutes. Officials of the company believe that the length of time has increased recently, either due to a change in the workforce or due to a change in customer purchasing policies. The processing time (in minutes) was recorded for a random sample of 15 orders processed over the past month: 28 25 27 31 10 26 30 15 55 12 24 32 28 42 38
+
+1.  Check the normality of the data
+
+2.  Test the hypothesis at the significance level $\alpha = 0.05$
+
+### Solution
+
+First we check for normality.
+
+```{r}
+data = c(28,25,27,31,10,26,30,15,55,12,24,32,28,42,38)
+
+qqnorm(data)
+qqline(data)
+
+shapiro.test(data)
+```
+
+Much of the data in the QQ plot falls on the line, implying that the data is normally distributed. Furthermore, the p-value of the Shapiro-Wilk test is 0.4038, which is much greater that 0.05 and tells us that it is very unlikely that the distribution that the data was sampled from is non-normal.
+
+Now, we test whether the time has increased or not. We know that the sample is from a normally distributed population, but we do not know its variance, so we use a t-test.
+
+```{r}
+t.test(data, alternative="greater", mu=25, conf.level=0.95)
+```
+
+The p-value of the test is 0.1485, which is greater that the significance level of 0.05, so there is insufficient evidence to suggest that processing time has significantly increased.
+
+## Part 2
+
+An agricultural experiment station was interested in comparing the yields for two new varieties of corn. Because the investigators thought that there might be a great deal of variability in yield from one field to another, each variety was randomly assigned to a different 1-acre plot on each of seven farms. The 1- acre plots were planted; the corn was harvested at maturity. The results of the experiment (in bushels of corn) are listed here. Use these data to test the null hypothesis that there is no difference in mean yields for the two varieties of corn. Use $\alpha=0.05$.
+
+| Farm | Variety A | Variety |
+|:----:|:---------:|:-------:|
+|  1   |   48.2    |  41.5   |
+|  2   |   44.6    |  40.1   |
+|  3   |   49.7    |  44.4   |
+|  4   |   40.5    |  41.2   |
+|  5   |   54.6    |  49.8   |
+|  6   |   47.1    |  41.7   |
+|  7   |   51.4    |  46.8   |
+
+### Solution
+
+First we assess normality.
+
+```{r}
+A = c(48.2,44.6,49.7,40.5,54.6,47.1,51.4)
+B = c(41.5,40.1,44.4,41.2,49.8,41.7,46.8)
+
+qqnorm(A)
+qqline(A)
+
+qqnorm(B)
+qqline(B)
+
+shapiro.test(A)
+shapiro.test(B)
+```
+
+The tests indicate that it is unlikely that the data were sampled from non-normal populations. So, we have samples from normal populations with unknown variances. We use a t-test.
+
+```{r}
+t.test(A, B, "t", conf.level=0.05)
+```
+
+Since the p-value of 0.071 is greater than that confidence level of 0.05, there is insufficient evidence to suggest that the mean yield of the corn varieties are the same. That is, there is a significant difference in yield between the two varieties.
+
+## Part 3
+
+### Problem 1
+
+A marketing manager conducted a study to determine whether there is a linear relationship between money spent on advertising and company sales. The data are listed in the following table.
+
+| Advertising expenses (1000s of \$) | Company sales (1000s of \$) |
+|:----------------------------------:|:---------------------------:|
+|                2.4                 |             225             |
+|                1.6                 |             184             |
+|                2.0                 |             220             |
+|                2.6                 |             240             |
+|                1.4                 |             180             |
+|                1.6                 |             184             |
+|                2.0                 |             186             |
+|                2.2                 |             215             |
+
+1.  What is the correlation coefficient between these two variables?
+
+2.  Write down the least squares regression equation.
+
+3.  What is the coefficient of determination of your regression?
+
+4.  At $\alpha = 0.01$ is there a significant linear relationship between these variables?
+
+5.  Suppose a company plans to spend \$1,800 on advertising. What is the expected sales?
+
+#### Solution
+
+```{r}
+df <- data.frame(expense=c(2.4,1.6,2.0,2.6,1.4,1.6,2.0,2.2),
+                 sales=c(225,184,220,240,180,184,186,215))
+
+cor(df$expense, df$sales)
+
+library(ggplot2)
+fit <- lm(sales~expense, df)
+ggplot(df, aes(x=expense, y=sales)) + geom_point() + stat_smooth(method="lm", col="red")
+summary(fit)
+
+predict(fit, newdata=data.frame(expense=c(1.8)), interval="prediction", level=0.99)
+```
+
+1.  0.9129
+
+2.  company sales = 50.73\*advertising expenses + 104.06
+
+3.  0.8334
+
+4.  Yes, and the significance extends to $\alpha = 0.001$
+
+5.  The expected sales is \$195.37, with a 99% prediction interval of (\$154.46, \$236.28)
+
+### Problem 2
+
+Read about the epil dataset using `?MASS::epil`. Inspect the dependency of the number of seizures ($y$) in the age of the patient (age) and the treatment (trt).
+
+1.  Fit a Poisson regression with glm and family = "poisson".
+
+2.  Does the treatment reduce the frequency of the seizures?
+
+3.  According to this model, what would be the number of seizures for 20 years old patient with progabide treatment?
+
+#### Solution
+
+```{r}
+library(MASS)
+fit <- glm(y ~ (age+trt)^2, poisson, epil)
+summary(fit)
+predict(fit, newdata=data.frame(age=c(20),trt=c("progabide")), interval="prediction", level=0.95)
+```
+
+1.  The fit produces the model $\log y = 1.2290 + 0.0311 \cdot age + 2.2634 \cdot progabide - 0.0843 \cdot age:progabide$
+
+2.  According to this fit, the treatment does not reduce the frequency of seizures universally (estimate for trtprogabide is positive), but it does reduce the frequency of seizures in older patients (estimate of age:trtprogabide is negative).
+
+3.  2.4291
