@@ -1,0 +1,199 @@
+---
+title: "Ams394Hw3"
+author: "William Daniels"
+date: "2024-06-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework 3
+
+William Daniels, 21 June 2024, AMS 394: Statistical laboratory
+
+## Problem 1
+
+If the data are centered, the line passes through the origin (0,0). ($\bar{x} = 0$, $\bar{y} = 0$).
+
+### Solution
+
+The intercept is given by the formula $\beta_0 = \bar{y} - \beta_1 \bar{x}$, where $\beta_1$ is the slope. Since we have been told that the mean of $x$ and $y$ are both zero, the intercept must be 0 regardless of the value of the slope. QED.
+
+## Problem 2
+
+Prove the following:
+
+$$ \sum_{i=1}^n \widehat{Y}_i e_i = 0 $$
+
+### Solution
+
+Here, $\widehat{Y}_i$ is the prediction of the linear model and $e_i$ is the error term. Substituting the definition for $\widehat{Y}_i$ into the sum, we get
+
+$$ \sum_{i=1}^n \left(\beta_0 + \beta_1 X_i\right) e_i = 0 $$
+
+This can be expressed as two sums:
+
+$$ \sum \beta_0 e_i + \sum \beta_1 X_i e_i = 0 $$
+
+Since we know that the sum of the residuals is zero from our study of the linear model, the first sum must be zero. We can apply linearity to the second sum get:
+
+$$ \beta_1 \sum X_i e_i = 0 $$
+
+Now we apply the definition of $e_i$ to get:
+
+$$ \sum X_i \left( \widehat{Y}_i - \beta_0 - \beta_1 X_i \right) = 0 $$
+
+This can be expressed as several sums according to:
+
+$$ \sum X_i \widehat{Y}_i - \beta_0 \sum X_i - \beta_1 \sum X_i^2 = 0 $$
+
+Now we use again the definition $\widehat{Y}_i = \beta_0 + \beta_1 X_i$ to find:
+
+$$ \sum X_i \left(\beta_0 + \beta_1 X_i\right) - \beta_0 \sum X_i - \beta_1 \sum X_i^2 = 0 $$
+
+Expanding the leftmost sum, we find:
+
+$$ \beta_0 \sum X_i + \beta_1 \sum X_i^2 - \beta_0 \sum X_i - \beta_1 \sum X_i^2 = 0 $$
+
+$$ 0 = 0 $$
+
+QED.
+
+## Problem 3
+
+Prove the following:
+
+$$ SSE = \sum_{i=1}^n \left( Y_i - \bar{Y} \right)^2 - \hat{\beta}_1^2 \sum_{i=1}^n \left( X_i - \bar{X} \right)^2 $$
+
+### Solution
+
+Let's start with the definition of $SSE$ and recover the statement.
+
+$$ SSE = \sum \left( Y_i - \widehat{Y}_i \right)^2 $$
+
+We can express $\widehat{Y}_i$ in terms of the regression parameters:
+
+$$ SSE = \sum \left(Y_i - \hat{\beta}_0 - \hat{\beta}_1 X_i \right)^2 $$
+
+The intercept can be given in terms of the slope by $\hat{\beta}_0 = \bar{Y} - \hat{\beta}_1 \bar{X}$, yielding:
+
+$$ SSE = \sum \left( Y_i - \bar{Y} + \hat{\beta}_1 \bar{X} - \hat{\beta}_1 X_i \right)^2 $$
+
+$$ SSE = \sum \left( \left( Y_i - \bar{Y} \right) - \hat{\beta}_1 \left( X_i - \bar{X} \right) \right)^2 $$
+
+$$
+SSE = \sum \left( Y_i - \bar{Y} \right)^2 -
+2 \hat{\beta}_1 \sum \left( Y_i - \bar{Y} \right) \left( X_i - \bar{X} \right) +
+\hat{\beta}_1^2 \sum \left( X_i - \bar{X} \right)^2
+$$
+
+Now we use the formula $\hat{\beta}_1 = \frac{\sum \left( X_i - \bar{X} \right) \left( Y_i - \bar{Y} \right)}{\sum \left( X_i - \bar{X} \right)^2} \rightarrow \hat{\beta}_1 \sum \left( X - \bar{X} \right)^2 = \sum \left( X_i - \bar{X} \right) \left( Y_i - \bar{Y} \right)$ , which gets us:
+
+$$
+SSE = \sum \left( Y_i - \bar{Y} \right) -
+2 \hat{\beta}_1^2 \sum \left( X_i - \bar{X} \right)^2 +
+\hat{\beta}_1^2 \sum \left(X_i - \bar{X} \right)^2
+$$
+
+$$
+SSE = \sum \left( Y_i - \bar{Y} \right) -
+\hat{\beta}_1^2 \sum \left( X_i - \bar{X} \right)^2
+$$
+
+We have recovered the statement. QED.
+
+## Problem 4
+
+Use the built it `mtcars` data set, containing information about various car attributes. Analize this data using a generalized linear model (GLM) to understand factors that influence the miles per gallon (mpg) of the cars. The data set consists of the following columns:
+
+1.  `mpg`: Miles per gallon.
+
+2.  `cyl`: Number of cylinders.
+
+3.  `disp`: Displacement (cu.in.).
+
+4.  `hp`: Gross horsepower.
+
+5.  `drat`: Rear axle ratio.
+
+6.  `wt`: Weight (1000 lbs).
+
+7.  `qsec`: 1/4 mile time.
+
+8.  `vs`: Engine (0 = V-shaped, 1 = straight).
+
+9.  `am`: Transmission (0 = automatic, 1 = manual).
+
+10. `gear`: Number of forward gears.
+
+11. `carb`: Number of carburetors.
+
+You are to:
+
+1.  Load the `mtcars` data set into R.
+
+2.  Perform basic EDA to understand the structure of the data and summarize key statistics.
+
+3.  Convert necessary variables into factors.
+
+4.  Use a GLM to predict `mpg` based on the other variables in the data set.
+
+5.  Evaluate the model's performance using appropriate metrics and diagnostics.
+
+### Solution
+
+```{r}
+data <- mtcars
+
+# exploratory data analysis
+plot(data)
+
+for(n in setdiff(names(mtcars), "mpg")) {
+  l <- lm(data$mpg ~ data[[n]])
+  s <- summary(l)
+  plot(mtcars[[n]], mtcars$mpg,
+       xlab=n, ylab="mpg")
+  abline(l, col="red")
+  text(x = par("usr")[2], y = par("usr")[4], 
+       labels = sprintf("R^2= %.4f", s$r.squared),
+       adj = c(1, 1))
+}
+
+library(corrplot)
+corrplot(cor(data), method="num")
+
+# build model
+all <- glm(mpg ~ cyl+disp+hp+drat+wt+qsec+vs+am+gear+carb, data=data, family="Gamma")
+summary(all)
+1-pchisq(all$null.deviance-all$deviance, df=(all$df.null-all$df.residual))
+plot(all, which=1)
+
+few <- glm(mpg ~ wt+qsec+vs+gear+carb, data=data, family="Gamma")
+summary(few)
+1-pchisq(few$null.deviance-few$deviance, df=(few$df.null-few$df.residual))
+library(car)
+avPlots(few)
+plot(few, which=1)
+
+fin <- glm(mpg ~ wt+qsec, data=data, family="Gamma")
+summary(fin)
+1-pchisq(fin$null.deviance-fin$deviance, df=(fin$df.null-fin$df.residual))
+avPlots(fin)
+plot(fin, which=1)
+```
+
+My EDA consisted of the scatter plot matrix, linear fits of each variable vs mpg, and the correlation matrix. The scatter plot matrix revealed two key aspects of the data: mpg values are positive definite and the relationship is not totally linear but resembles an exponential or inverse function. From the correlation matrix, it was noted that many variables were highly correlated ($R>0.6$) with `wt`.
+
+An important decision is what family to use for the GLM. I chose Gamma, because of it's link function being the inverse and the property that variance should increase with increasing response variable. Both of these are consistent with the data.
+
+When building the model, I first used every variable to try and explain `mpg`. This created a poor fit with only one significant variable, `wt` at $\alpha=0.01$. This clearly used too many explanatory variables, so I removed variables which were strongly correlated with each other. This is appropriate because the information is essentially redundant, if `wt` and `disp` are so well correlated ($R=0.89$) that they can be used to predict each other, their effectiveness in the model is reduced. So, I removed `cyl`, `disp`, `hp`, `drat`, and `am` on the basis that they were redundant to `wt`. `vs` was also removed for being correlated with `qsec`.
+
+The next model performed better but still contained insignificant variables: `vs`, `gear`, and `carb`. These variables simply are not helpful in predicting `mpg`, so they too were excluded, leading to the final model of `mpg` \~ `wt`+`qsec`, which was also the best model according to the following performance metrics summary table, in which models with lesser AIC explain the data better and no model was deemed entirely insignificant by the deviance goodness of fit test. AV plots were also produced for `few` and `fin`, which show what we expect given the significance of the predictors, and residuals were plotted for each model. All of the residuals appeared patternless and well behaved.
+
+| model | AIC    | Deviance GoF |
+|-------|--------|--------------|
+| `all` | 152.30 | 0.9915       |
+| `few` | 146.46 | 0.7887       |
+| `fin` | 143.45 | 0.3031       |
