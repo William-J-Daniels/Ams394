@@ -1,0 +1,108 @@
+---
+title: "DanielsAms394Hw4"
+author: "William Daniels"
+date: "2024-06-27"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework 4
+
+William Daniels, June 27 2024, AMS 394: Statistical laboratory
+
+## Problem 1
+
+Prove $SST = SSE + SSR$.
+
+### Solution
+
+We will start with the definitions:
+
+$$
+\sum \left( Y_i - \bar{Y} \right)^2
+=
+\sum \left( Y_i - \widehat{Y}_i \right)^2 +
+\sum \left( \widehat{Y}_i - \bar{Y} \right)^2
+$$
+
+Now we expand the binomials and combine like terms.
+
+$$
+\sum \left( Y_i - \bar{Y} \right)^2
+=
+\sum Y_i^2 -
+2 \sum Y_i \widehat{Y}_i +
+\sum \widehat{Y}_i^2 +
+\sum \widehat{Y}_i^2 -
+2 \sum \widehat{Y}_i \bar{Y} +
+\sum \bar{Y}^2
+$$
+
+$$
+\sum \left( Y_i - \bar{Y} \right)^2
+=
+\sum Y_i^2 -
+2 \sum Y_i \widehat{Y}_i +
+2 \sum \widehat{Y}_i^2 -
+2 \sum \widehat{Y}_i \bar{Y} +
+\sum \bar{Y}^2
+$$
+
+We use the following ordinary least squares properties: $\sum \widehat{Y} = \sum Y$ (sum of the predicted values equals sum of the actual values) and $\sum \widehat{Y} Y = \sum \widehat{Y}^2$ to get:
+
+$$
+\sum \left( Y_i - \bar{Y} \right)^2
+=
+\sum Y_i^2 -
+2 \sum \widehat{Y}_i^2 +
+2 \sum \widehat{Y}_i^2 -
+2 \sum \widehat{Y}_i \bar{Y} +
+\sum \bar{Y}^2
+$$
+
+$$
+\sum \left( Y_i - \bar{Y} \right)^2
+=
+\sum Y_i^2 -
+2 \sum Y_i \bar{Y} +
+\sum \bar{Y}^2
+$$
+
+$$
+\sum \left( Y_i - \bar{Y} \right)^2
+=
+\sum \left( Y_i - \bar{Y} \right)^2
+$$
+
+QED.
+
+## Problem 2
+
+Analyze the data set `InsectSprays`, which is from an agricultural experiment that tested the effectiveness of different insect sprays. The columns are `count`, which is a number of insects, and `spray`, the category of spray A though F.
+
+Summarize the data set and perform exploratory data analysis. Create box plots for each category of spray, and perform one way ANOVA tests to check if the difference is significant, clearly stating the null and alternative hypotheses. Draw conclusions from this analysis.
+
+### Solution
+
+```{r}
+data(InsectSprays)
+library(ggplot2)
+
+by(InsectSprays$count, InsectSprays$spray, summary)
+
+ggplot(InsectSprays, aes(x=count)) +
+  geom_histogram(binwidth=1) +
+  facet_wrap(~ spray, scales="free") +
+  labs(title="Histograms by spray", x="Value", y="Count")
+
+ggplot(InsectSprays, aes(x=count, y=spray))+geom_boxplot()
+
+pairwise.t.test(InsectSprays$count, InsectSprays$spray)
+```
+
+The null hypothesis of the tests are $\mu_i - \mu_j = 0$. So, a p-value greater than a chosen confidence level indicates that there is insufficient evidence to suggest that the data were sampled from normal distributions with the same mean. That is, a low p-value indicates than the means are significantly different.
+
+So, according to this test, sprays A, B, and F do not have significantly different insect counts and sprays C, D and E do not have significantly different insect counts. These two groups are significantly different. This is reflected in the box plots. From this, we can conclude that sprays C, D, and E are more effective than sprays A, B and F.
