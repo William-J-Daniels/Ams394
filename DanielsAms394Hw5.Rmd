@@ -150,6 +150,10 @@ Choice **4** is correct.
 | 9        | 3      | C      |
 | 10       | 4      | D      |
 
+```{r}
+barplot(prop.table(table(c("C","B","D","A","A","A","A","C","C","C","D"))))
+```
+
 ## True/false questions
 
 ### In R, the function `lm()` can handle both linear and non-linear regression models.
@@ -207,6 +211,10 @@ True
 | 9        | False  |
 | 10       | True   |
 
+```{r}
+barplot(prop.table(table(c("F","F","T","F","F","T","T","T","F","T"))))
+```
+
 ## Coding problems
 
 ### Data manipulation with `mtcars`
@@ -262,7 +270,7 @@ data("iris")
 
 g <- ggplot(data=iris, aes(x=Sepal.Length, y=Sepal.Width)) +
   geom_point(aes(color=Species)) +
-  geom_smooth(method="loess", aes(color=Species)) +
+  geom_smooth(method="loess", formula=y~x, aes(color=Species)) +
   labs(title="Speal width vs sepal length for three species",
        y="Sepal width",
        x="Sepal length")
@@ -288,7 +296,7 @@ FilteredWeight <- ChickWeight %>%
   filter(Chick==1 | Chick==2)
 FilteredWeight %>%
   group_by(Chick) %>%
-  summarize_at(vars(weight), funs(ave=mean(.), med=median(.)))
+  summarize_at(vars(weight), list(ave=mean, med=median))
 
 pairwise.t.test(FilteredWeight$weight, FilteredWeight$Chick)
 
@@ -300,7 +308,7 @@ g
 
 ## Advanced R coding
 
-### Complex Two-Sample Test with `AirPassengers`
+### Complex two-sample test with `AirPassengers`
 
 1.  Convert `AirPassengers` into a data frame with `Year` and `Passengers`.
 
@@ -312,11 +320,25 @@ g
 
 ```{r}
 data("AirPassengers")
-ap <- as.data.frame(AirPassengers)
-AirPassengers
+
+ap = aggregate(AirPassengers, nfrequency=1)
+ap <- data.frame(
+  year = time(ap),
+  passengers = log(ap)
+)
+
+ap$era = ap$year < 1955
+
+t.test(ap[!ap$era,]$passengers, ap[ap$era,]$passengers,
+       alternative="greater")
+
+ggplot(data=ap, aes(x=year, y=passengers)) +
+  geom_point(size=5, aes(color=factor(era)))
 ```
 
-### Regression with Interaction Terms in `mtcars`
+I decided that before every year before 1955 was an era and 1955 onward was another. I also used the occasion of creating the data frame to take the log of passengers.
+
+### Regression with interaction terms in `mtcars`
 
 1.  Fit a linear model with `mpg` as dependent, including `wt`, `hp`, and their interaction.
 
@@ -398,10 +420,58 @@ $$
 y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_{1:2} x_1 x_2 + \epsilon
 $$
 
-The interaction coefficient, $\beta_{1:2}$, is multiplied by both $x_1$ and $x_2$, giving rise to the observed quadratic. These equations also confirms my observation that the two lines are in the same plane perpendicular to the predictors. Looking at the regression equations, I realize that lines are not the best way to visualize the results, these equations dont describe lines, but planes in 3D space; a flat plane for the first equation and a quadratic curved plane for the second. Also, it turns out these two planes do no have parallel perpendicular planes everywhere, what I noticed in my original visualization (the one in this document is updated to planes instead of lines) was actually just an artifact of how I plotted the lines. I encourage you to rotate the interactive plot to fully appreciate the structure of the curved plane, it is difficult to do so with only one angle. I also generate added variable plots, which show the effect of one variable while holding the other at their regression values.
+The interaction coefficient, $\beta_{1:2}$, is multiplied by both $x_1$ and $x_2$, giving rise to the observed quadratic. These equations also confirm my observation that the two lines are in the same plane perpendicular to the predictors. Looking at the regression equations, I realize that lines are not the best way to visualize the results, these equations don't describe lines, but planes in 3D space; a flat plane for the first equation and a quadratic curved plane for the second. Also, it turns out these two planes do no have parallel perpendicular planes everywhere, what I noticed in my original visualization (the one in this document is updated to planes instead of lines) was actually just an artifact of how I plotted the lines. I encourage you to rotate the interactive plot to fully appreciate the structure of the curved plane, it is difficult to do so with only one angle. I also generated added variable plots, which show the effect of one variable while holding the others at their regression values.
 
 The purpose of interaction terms is to capture how explanatory variables influence each other. A quick way to intuit this is using examples: it makes sense that the weight of a car would influence its horse power, or that genetics would influence at what age one begins to bald. This is why $x_1$ and $x_2$ are multiplied in the regression equation. So, to interpret the factors of the complex multiple regression:
 
--   The factors fot `wt` and `hp` are both negative, indicating that cars become less fuel efficient as they become heavier and more powerful. The effect is more exaggerated, but no less significant, for weight.
+-   The factors for `wt` and `hp` are both negative, indicating that cars become less fuel efficient as they become heavier and cars become less fuel efficient as they become more powerful. The effect is more exaggerated, but no less significant, for weight.
 
--   The factor for `wt:hp` is slightly positive and it's magnitude is less than that for the `wt` and `hp` factors; this is clearly visible in the AV plots. This indicates that there is an optimal power to weight ratio to maximize efficiency with statistical significance. This optimal line could be found analytically, but I've already spend a lot of extra time on this problem so I leave it as an exercise I might do after the final. It can be visualized in the plot by following the curvature of the surface, which the contour lines are useful for.
+-   The factor for `wt:hp` is slightly positive and it's magnitude is less than that of the `wt` and `hp` factors, which is clearly visible in the AV plots. This indicates that there is an optimal power to weight ratio to maximize efficiency with statistical significance. This optimal line could be found analytically, but I've already spent a lot of extra time on this problem so I leave it as an exercise I might do after the final. It can be visualized on the plot by following the curvature of the surface, which the contour lines are useful for.
+
+### Paired t-test with `sleep`
+
+1.  Perform a paired t-test to compare the effect of two drugs on sleep duration using the `sleep` data set.
+
+2.  Ensure pairing based on individual `ID`.
+
+#### Solution
+
+```{r}
+data(sleep)
+
+sleep
+with(sleep,
+     t.test(extra[group == 1], extra[group == 2],
+            alternative = "two.sided", paired = TRUE))
+```
+
+We can tell by inspection of the data frame that we don't need any extra work to get pairing by `ID`. The difference is significant.
+
+### Simple linear regression analysis with `iris`
+
+1.  Fit a linear regression model using `Petal.Width` to predict `Petal.Length`.
+
+2.  Examine the model's summary for insights.
+
+3.  Create a plot showing the regression line and data points.
+
+#### Solution
+
+```{r}
+data("iris")
+library(ggplot2)
+
+l <- lm(Petal.Length ~ Petal.Width, data=iris)
+summary(l)
+
+ggplot(data=iris, aes(x=Petal.Width, y=Petal.Length)) +
+  geom_point(aes(color=Species)) +
+  geom_smooth(method='lm', formula=y~x, color="black") +
+  geom_smooth(method='lm', formula=y~x, aes(color=Species)) +
+  labs(title="Regression predicting petal length from petal width",
+       y="Petal length",
+       x="Petal width")
+
+```
+
+I added the extra fits with ggplot because i was curious how the per species fits deviated from the global fit. The linear model shows that there is a highly significant relationship between the length and width of petals. The R-squared is exceptionally high, $R^2 > 0.9$, which implies that we can explain the variance well without considering which species the petal comes from, which is surprising when looking at the per-species fits plotted with the global fit.

@@ -1,6 +1,7 @@
 *.pdf
 *.html
 Homework*.Rmd
+Project.Rmd
 *~
 .RData
 .Rhistory
