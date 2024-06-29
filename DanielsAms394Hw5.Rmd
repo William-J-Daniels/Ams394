@@ -1,0 +1,407 @@
+---
+title: "DanielsAms394Hw5"
+author: "William Daniels"
+date: "2024-06-28"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Homework 5
+
+William Daniels, July 1 2024, AMS 395: Statistical laboratory
+
+## Multiple choice questions
+
+### In R, what is the primary use of the `summary()` function when applied to a data frame?
+
+1.  It plots the distribution of each variable in the data frame.
+
+2.  It provides a detailed correlation matrix for all variables.
+
+3.  It gives a concise summary of the data frame, including information like mean, median, and quartiles for each variable.
+
+4.  It checks the data frame for missing values.
+
+Choice **3** is correct.
+
+### A one-sample t-test is used to:
+
+1.  Compare the means of two independent samples.
+
+2.  Compare the mean of a sample with a predefined population mean.
+
+3.  Determine if the variance of a sample matches a known value.
+
+4.  Test the relationship between two categorical variables.
+
+Choice **2** is correct.
+
+### When performing a two-sample t-test, what assumption is made about the two samples?
+
+1.  They come from populations with the same variance.
+
+2.  They are dependent samples.
+
+3.  They are of equal size.
+
+4.  They are from normally distributed populations.
+
+Choice **4** is correct.
+
+### In simple linear regression, what does the slope coefficient represent?
+
+1.  The change in the dependent variable for a one-unit change in the independent variable.
+
+2.  The average value of the dependent variable.
+
+3.  The correlation between the dependent and independent variables.
+
+4.  The variance of the dependent variable.
+
+Choice **1** is correct.
+
+### In the context of linear regression analysis, which of the following correctly describes the relationship between $SSE$, $SSR$, and $SSTO$?
+
+1.  $SSTO = SSE + SSR$, where $SSTO$ represents the total variability in the data, $SSE$ is the unexplained variability, and $SSR$ is the variability explained by the model.
+
+2.  $SSE = SSTO + SSR$, where $SSE$ represents the total variability in the data, $SSTO$ is the unexplained variability, and $SSR$ is the variability explained by the model.
+
+3.  $SSR = SSTO + SSE$, where $SSR$ represents the total variability in the data, $SSTO$ is the unexplained variability, and $SSE$ is the variability explained by the model.
+
+4.  $SSTO = SSR - SSE$, where $SSTO$ represents the total variability in the data, $SSR$ is the unexplained variability, and $SSE$ is the variability explained by the model.
+
+Choice **1** is correct.
+
+### In an ANOVA test, the F-statistic is used to:
+
+1.  Compare the mean square between groups to the mean square within groups.
+
+2.  Calculate the total variance in the data.
+
+3.  Determine the individual differences between group means.
+
+4.  Assess the normality of the data.
+
+Choice **1** is correct.
+
+### Which R function is used to create basic histograms?
+
+1.  `plot()`
+
+2.  `barplot()`
+
+3.  `hist()`
+
+4.  `ggplot()`
+
+Choice **3** is correct.
+
+### What does a high p-value (greater than 0.05) in a hypothesis test typically indicate?
+
+1.  The null hypothesis can be rejected with high confidence.
+
+2.  There is strong evidence against the null hypothesis.
+
+3.  There is insufficient evidence to reject the null hypothesis.
+
+4.  The test has a high level of precision.
+
+Choice **3** is correct.
+
+### In R, which package is primarily used for producing elegant data visualizations?
+
+1.  `dplyr`
+
+2.  `tidyr`
+
+3.  `ggplot2`
+
+4.  `shiny`
+
+Choice **3** is correct.
+
+### In regression analysis, which statement is true regarding the Sum of Squared Errors ($SSE$), the Sum of Squares due to Regression ($SSR$), and the Total Sum of Squares ($SSTO$)?
+
+1.  A lower $SSE$ indicates a model with poor fit.
+
+2.  $SSR$ is the portion of $SSTO$ that cannot be explained by the regression model.
+
+3.  An increase in $SSR$ leads to a decrease in $SSTO$.
+
+4.  $SSTO$ is the sum of $SSR$ and $SSE$, representing the total variation in the dependent variable.
+
+Choice **4** is correct.
+
+### Solution table
+
+| Question | Number | Letter |
+|----------|--------|--------|
+| 1        | 3      | C      |
+| 2        | 2      | B      |
+| 3        | 4      | D      |
+| 4        | 1      | A      |
+| 5        | 1      | A      |
+| 6        | 1      | A      |
+| 7        | 3      | C      |
+| 8        | 3      | C      |
+| 9        | 3      | C      |
+| 10       | 4      | D      |
+
+## True/false questions
+
+### In R, the function `lm()` can handle both linear and non-linear regression models.
+
+False
+
+### A one-sample t-test can be used to compare the means of two paired samples.
+
+False
+
+### In a two-sample t-test, the assumption of normality is more crucial when dealing with small sample sizes.
+
+True
+
+### In simple linear regression, a significant t-test for a regression coefficient implies that the overall model is a good fit for the data.
+
+False
+
+### In multiple regression analysis, if the R-squared value is high, it guarantees that the model predictions will be accurate.
+
+False
+
+### A high p-value in a hypothesis test (greater than 0.05) generally indicates strong evidence in favor of the null hypothesis.
+
+True
+
+### In R, the `ggplot2` package's layering system allows for the addition of statistical transformations such as linear regression lines.
+
+True
+
+### In a linear regression model, homoscedasticity implies that the variances of the residuals are consistent across all levels of the independent variables.
+
+True
+
+### The `apply()` function in R can only be used for operations on matrices and does not work with data frames.
+
+False
+
+### In regression analysis, the Adjusted R-squared value can decrease when additional predictors are added to the model.
+
+True
+
+### Solution table
+
+| Question | Answer |
+|----------|--------|
+| 1        | False  |
+| 2        | False  |
+| 3        | True   |
+| 4        | False  |
+| 5        | False  |
+| 6        | True   |
+| 7        | True   |
+| 8        | True   |
+| 9        | False  |
+| 10       | True   |
+
+## Coding problems
+
+### Data manipulation with `mtcars`
+
+1.  Load the `dplyr` package.
+
+2.  Add a new column `mpg_level` to the `mtcars` dataset. This column should categorize cars into `"High"`, `"Medium"`, or `"Low"` efficiency based on `mpg` (miles per gallon).
+
+3.  Summarize the average horsepower (`hp`) and average quarter-mile time (`qsec`) for each `mpg_level` category.
+
+4.  Arrange the summary in ascending order of average horsepower.
+
+#### Solution
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+data("mtcars")
+mycars = mtcars
+
+mpg_qs <- quantile(mycars$mpg, c(0, 0.25, 0.75, 1.0))
+mycars$mpg_level <- cut(mycars$mpg, breaks = mpg_qs,
+                        labels = c("Low", "Medium", "High"),
+                        include.lowest=TRUE)
+
+ggplot(mycars, aes(x=hp, y=mpg_level))+geom_boxplot()
+ggplot(mycars, aes(x=qsec, y=mpg_level))+geom_boxplot()
+mycars %>%
+  group_by(mpg_level) %>%
+  summarize_at(vars(hp, qsec),
+               list(avg=mean, min=min, med=median, max=max)) %>%
+  arrange(hp_avg)
+```
+
+### Data visualization with `iris`
+
+1.  Load the `ggplot2` package.
+
+2.  Create a scatter plot of `Sepal.Length` vs `Sepal.Width`.
+
+3.  Color the points by the `Species` column.
+
+4.  Add a loess smoothed line to the plot for each species.
+
+5.  Provide appropriate labels for the axes and add a title to the plot.
+
+#### Solution
+
+```{r}
+library(ggplot2)
+data("iris")
+
+g <- ggplot(data=iris, aes(x=Sepal.Length, y=Sepal.Width)) +
+  geom_point(aes(color=Species)) +
+  geom_smooth(method="loess", aes(color=Species)) +
+  labs(title="Speal width vs sepal length for three species",
+       y="Sepal width",
+       x="Sepal length")
+g
+```
+
+### Statistical analysis with `ChickWeight`
+
+1.  Filter the data for `Chick` 1 and 2 only.
+
+2.  Perform a t-test to determine if there is a significant difference in the average `weight` between `Chick` 1 and 2.
+
+3.  Create a line plot showing the growth of `weight` over `Time` for these two chicks. Use different colors to distinguish between the chicks.
+
+#### Solution
+
+```{r}
+data("ChickWeight")
+library(dplyr)
+library(ggplot2)
+
+FilteredWeight <- ChickWeight %>%
+  filter(Chick==1 | Chick==2)
+FilteredWeight %>%
+  group_by(Chick) %>%
+  summarize_at(vars(weight), funs(ave=mean(.), med=median(.)))
+
+pairwise.t.test(FilteredWeight$weight, FilteredWeight$Chick)
+
+g <- ggplot(data=FilteredWeight, aes(x=Time, y=weight)) +
+  geom_point(aes(color=Chick), size=3) +
+  geom_line(aes(color=Chick))
+g
+```
+
+## Advanced R coding
+
+### Complex Two-Sample Test with `AirPassengers`
+
+1.  Convert `AirPassengers` into a data frame with `Year` and `Passengers`.
+
+2.  Create a binary variable `Era` and categorize the years.
+
+3.  Conduct a two-sample test on the log-transformed passengers data between eras.
+
+#### Solution
+
+```{r}
+data("AirPassengers")
+ap <- as.data.frame(AirPassengers)
+AirPassengers
+```
+
+### Regression with Interaction Terms in `mtcars`
+
+1.  Fit a linear model with `mpg` as dependent, including `wt`, `hp`, and their interaction.
+
+2.  Assess the significance of interaction terms.
+
+3.  Interpret the model coefficients, especially the interaction term.
+
+#### Solution
+
+```{r}
+library(plotly)
+library(car)
+library(dplyr)
+
+data("mtcars")
+
+l <- lm(mpg ~ wt + hp, data=mtcars)
+summary(l)
+synthcars = data.frame(wt = seq(min(mtcars$wt), max(mtcars$wt), length.out = 100),
+                       hp = seq(min(mtcars$hp), max(mtcars$hp), length.out = 100))
+synthcars$mpg = matrix(predict(l, expand.grid(synthcars)), nrow=100, ncol=100)
+
+li <- lm(mpg ~ wt + wt:hp + hp, data=mtcars)
+summary(li)
+synthcarsi = data.frame(wt = seq(min(mtcars$wt), max(mtcars$wt), length.out = 100),
+                        hp = seq(min(mtcars$hp), max(mtcars$hp), length.out = 100))
+synthcarsi$mpg = matrix(predict(li, expand.grid(synthcarsi)), nrow=100, ncol=100)
+
+plot_ly() %>%
+  add_trace(x = mtcars$wt,
+            y = mtcars$hp,
+            z = mtcars$mpg,
+            type = "scatter3d",
+            mode = "markers",
+            marker = list(color = mtcars$wt+mtcars$hp+mtcars$mpg,
+                          colorscale = "Viridis"),
+            name = "Data") %>%
+  add_surface(x = synthcars$wt,
+              y = synthcars$hp,
+              z = synthcars$mpg,
+              colorscale = "Viridis",
+              opacity = 0.2,
+              contours = list(x = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              y = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              z = list(show = TRUE, color = "gray", width = 1, opacity = 0.3)),
+              name = "No interaction") %>%
+  add_surface(x = synthcarsi$wt,
+              y = synthcarsi$hp,
+              z = synthcarsi$mpg,
+              colorscale = "Viridis",
+              opacity = 0.2,
+              contours = list(x = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              y = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              z = list(show = TRUE, color = "gray", width = 1, opacity = 0.3)),
+              name = "With interaction") %>%
+  layout(title = "mpg vs hp and wt",
+         scene = list(xaxis = list(title = "wt"),
+                      yaxis = list(title = "hp"),
+                      zaxis = list(title = "mpg"),
+                      camera = list(eye = list(x = 0, y = -1, z = 0.5))))
+
+avPlots(l)
+avPlots(li)
+```
+
+When adding the interaction term to a model predicting `mpg` from `wt` and `hp`, the significance level of `wt` changes from 0.001 to effectively 0, the interaction term `wt:hp` also has that significance, `wt` and `(Intercept)` remain at $\alpha \approx 0$ and the adjusted R-squared increases from 0.8148 to 0.8724. Clearly, including `wt:hp` improves the model. Since `mpg` is being predicted from two variables, I took the opportunity to visualize the difference caused by introducing the interaction term using `plotly` to plot in 3D.
+
+Surprisingly (at first), the line of best fit is no longer a line but a quadratic polynomial that lies in the same plane perpendicular to `wt` and `hp` as the line without the interaction term. I say that this was surprising *at first* because there is no line which is more optimal than the one estimated by `lm` (when using the same estimator), so to introduce another term to the regression equation without adding another variable would require increasing the order of the polynomial. Since we introduce one more term, the line becomes a quadratic.
+
+Of course that is just a rough intuition. I checked a text and found that I was not far from what is really going on. The regression equation for a simple multiple regression with two predictors is
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \epsilon
+$$
+
+When including the interaction term, this changes to
+
+$$
+y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + \beta_{1:2} x_1 x_2 + \epsilon
+$$
+
+The interaction coefficient, $\beta_{1:2}$, is multiplied by both $x_1$ and $x_2$, giving rise to the observed quadratic. These equations also confirms my observation that the two lines are in the same plane perpendicular to the predictors. Looking at the regression equations, I realize that lines are not the best way to visualize the results, these equations dont describe lines, but planes in 3D space; a flat plane for the first equation and a quadratic curved plane for the second. Also, it turns out these two planes do no have parallel perpendicular planes everywhere, what I noticed in my original visualization (the one in this document is updated to planes instead of lines) was actually just an artifact of how I plotted the lines. I encourage you to rotate the interactive plot to fully appreciate the structure of the curved plane, it is difficult to do so with only one angle. I also generate added variable plots, which show the effect of one variable while holding the other at their regression values.
+
+The purpose of interaction terms is to capture how explanatory variables influence each other. A quick way to intuit this is using examples: it makes sense that the weight of a car would influence its horse power, or that genetics would influence at what age one begins to bald. This is why $x_1$ and $x_2$ are multiplied in the regression equation. So, to interpret the factors of the complex multiple regression:
+
+-   The factors fot `wt` and `hp` are both negative, indicating that cars become less fuel efficient as they become heavier and more powerful. The effect is more exaggerated, but no less significant, for weight.
+
+-   The factor for `wt:hp` is slightly positive and it's magnitude is less than that for the `wt` and `hp` factors; this is clearly visible in the AV plots. This indicates that there is an optimal power to weight ratio to maximize efficiency with statistical significance. This optimal line could be found analytically, but I've already spend a lot of extra time on this problem so I leave it as an exercise I might do after the final. It can be visualized in the plot by following the curvature of the surface, which the contour lines are useful for.
