@@ -1,0 +1,214 @@
+---
+title: "DanielsAms392Project"
+author: "William Daniels"
+date: "2024-07-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Predicting amount of body fat from body measurements
+
+William Daniels, July 01, 2024. Project for AMS 394: statistical laboratory.
+
+## Abstract
+
+In this project, I attempt to explain the amount of body fat using the triceps skinfold thickness, thigh thickness, and midarm circumference using linear regression analysis. Using the "Body fat" data set from *Applied Statistical Models* (1977), a simple linear model was constructed with the regression equation $(am)^2 = -\left(1956.262 \pm 130.390\right) + \left(41.309 \pm 2.244\right) st + \left(18.747 \pm 2.673\right) tc + \epsilon$, with $R^2 = 0.9607$.
+
+## Introduction
+
+The "Body Fat" data set from *Applied Statistical Models (4e)* by Neter, Kutner, Nachtsheim, and Wasserman (1977) catalogs the amount of body fat in [percent], triceps skinfold thickness in [mm], thigh circumference in [cm], and midarm circumference in [cm] of 20 human females aged 25- 30 years. Since it is difficult to directly measure how much body fat one has but easy to take body measurements, the interesting question here is clearly if we can predict body fat using the other data. I have hard coded the data into this document below for easy portability.
+
+```{r}
+BodyFat = data.frame(
+  am = c(19.5, 24.7, 30.7, 29.8, 19.1, 25.6, 31.4, 27.9, 22.1, 25.5, 31.1, 30.4, 18.7, 19.7, 14.6, 29.5, 27.7, 30.2, 22.7, 25.2),
+  st = c(43.1, 49.8, 51.9, 54.3, 42.2, 53.9, 58.5, 52.1, 49.9, 53.5, 56.6, 56.7, 46.5, 44.2, 42.7, 54.4, 55.3, 58.6, 48.2, 51.0),
+  tc = c(29.1, 28.2, 37.0, 31.1, 30.9, 23.7, 27.6, 30.6, 23.2, 24.8, 30.0, 28.3, 21.3, 28.6, 21.3, 30.1, 25.7, 24.6, 27.1, 17.5),
+  mc = c(11.9, 22.8, 18.7, 20.1, 12.9, 21.7, 27.1, 25.4, 21.3, 19.3, 25.4, 27.2, 11.7, 17.8, 12.8, 23.9, 22.6, 25.4, 14.8, 21.1)
+)
+long.names = c("Amount", "Triceps skinfold thickness", "Thigh thickness", "Midarm circumference")
+library(knitr)
+kable(BodyFat,
+      col.names = long.names)
+```
+
+## Description of data
+
+Here some typical descriptions of the data are presented. They are presented in a concise graphic called a correlogram that combines box plots, a scatter plot matrix, and a correlation matrix. Avoiding the redundancy associated with standard scatter plot and correlation matrices, it is arranged in a grid wherein the lower triangle shows scatter plots, the upper triangle shows correlation statistics, and the diagonal shows box plots of the variables.
+
+```{r}
+library(ggplot2)
+library(GGally)
+
+diag_box <- function(data, mapping) {
+  g <- ggplot(data=data, mapping=mapping) +
+    geom_boxplot() +
+    theme_minimal()
+  return(g)
+}
+
+ggpairs(data = BodyFat,
+        title = "Body fat correlogram",
+        diag = list(continuous = diag_box),
+        columnLabels = long.names)
+```
+
+Immediately, we can tell that the amount of body fat, triceps skinfold thickness, and midarm circumference are strongly correlated ($R \geqslant 0.843$). The amount of body fat is loosely correlated with thigh circumference ($R = 0.409$), and no other correlations are significant ($R \leqslant 0.131$).
+
+## Methods and results
+
+We will predict body fat from the other free variables using a linear regression model. We start by running a regression that uses all predictors and another including their second-order interaction terms, since it is not unreasonable to expect that dimensions at one part of the body could influence those elsewhere. Residual plots are created for both.
+
+```{r}
+all <- lm(am ~ st + tc + mc, data = BodyFat)
+summary(all)
+plot(resid(all) ~ fitted(all))
+
+alli <- lm(am ~ (st + tc + mc)^2, data = BodyFat)
+summary(alli)
+plot(resid(alli) ~ fitted(alli))
+```
+
+Funnily enough, the model without interactions indicates that all predictors besides midarm circumference are significant at $\alpha \approx 0$ and the model with interactions reports that only midarm circumference is significant at $\alpha = 0.05$. For both models, the residuals appear somewhat homoscedastic, though there is an outlier which is less egregious when including interactions. The adjusted $R^2$ is only marginally better with interactions, so the next model we build will be one without interactions or midarm circumference. Additionally, we will assess a model that includes the interaction of triceps skinfold thickness and thigh circumference. Furthermore, because we are using two predictors, interactive 3D plots are produced showing the data and regression result planes along with normal QQ plots.
+
+```{r}
+library(plotly)
+
+sel <- lm(am ~ st + tc, data = BodyFat)
+summary(sel)
+plot(resid(sel) ~ fitted(sel))
+qqnorm(resid(sel))
+qqline(resid(sel))
+shapiro.test(resid(sel))
+
+sel_pred <- data.frame(
+  st = seq(min(BodyFat$st), max(BodyFat$st), length.out=100),
+  tc = seq(min(BodyFat$tc), max(BodyFat$tc), length.out=100)
+)
+sel_pred$am = matrix(predict(sel, expand.grid(sel_pred)),
+                      nrow=100, ncol=100)
+plot_ly() %>%
+  add_trace(x = BodyFat$st,
+            y = BodyFat$tc,
+            z = BodyFat$am,
+            type = "scatter3d",
+            mode = "markers",
+            marker = list(color = BodyFat$st+BodyFat$tc,
+                          colorscale = "Viridis")) %>%
+  add_surface(x = sel_pred$st,
+              y = sel_pred$tc,
+              z = sel_pred$am,
+              colorscale = "Viridis",
+              opacity = 0.2,
+              contours = list(x = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              y = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              z = list(show = TRUE, color = "gray", width = 1, opacity = 0.3))) %>%
+  layout(title = "Linear model without interactions",
+         scene = list(xaxis = list(title = "Triarms skinfold thickness"),
+                      yaxis = list(title = "Thigh circumference"),
+                      zaxis = list(title = "Amount")))
+
+seli <- lm(am ~ st + tc + st:tc, data = BodyFat)
+summary(seli)
+plot(resid(seli) ~ fitted(seli))
+
+sel_predi <- data.frame(
+  st = seq(min(BodyFat$st), max(BodyFat$st), length.out=100),
+  tc = seq(min(BodyFat$tc), max(BodyFat$tc), length.out=100)
+)
+sel_predi$am = matrix(predict(sel, expand.grid(sel_predi)),
+                      nrow=100, ncol=100)
+plot_ly() %>%
+  add_trace(x = BodyFat$st,
+            y = BodyFat$tc,
+            z = BodyFat$am,
+            type = "scatter3d",
+            mode = "markers",
+            marker = list(color = BodyFat$st+BodyFat$tc,
+                          colorscale = "Viridis")) %>%
+  add_surface(x = sel_predi$st,
+              y = sel_predi$tc,
+              z = sel_predi$am,
+              colorscale = "Viridis",
+              opacity = 0.2,
+              contours = list(x = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              y = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              z = list(show = TRUE, color = "gray", width = 1, opacity = 0.3))) %>%
+  layout(title = "Linear model with interactions",
+         scene = list(xaxis = list(title = "Triarms skinfold thickness"),
+                      yaxis = list(title = "Thigh circumference"),
+                      zaxis = list(title = "Amount")))
+```
+
+The two 3D visualizations were not very different. This is because the interaction term is both insignificant and small in magnitude. Again, the significance of the predictors is greater without interactions. Furthermore, the adjusted $R^2$ is greater for the model without interactions. The 3D plots admittedly are not particularly helpful, but I wanted to include them because they look cool 😊. The $R^2$ and predictor significance story is the same as last time, so I will continue the analysis using the model without interaction terms. However, the variance of the residuals does not seem constant, instead increasing with the fitted value (even though the normal QQ plot and Shapiro-Wilkes test indicate the residuals are normal). So, let's apply a Box-Cox transformation to see if we can improve the homoscedasticity.
+
+```{r}
+library(MASS)
+
+boxcox(sel, lambda=seq(-1, 3, 0.1))
+
+sel_trans <- lm(I(am^2) ~ st + tc, data = BodyFat)
+summary(sel_trans)
+plot(resid(sel_trans) ~ fitted(sel_trans))
+qqnorm(resid(sel_trans))
+qqline(resid(sel_trans))
+shapiro.test(resid(sel_trans))
+
+sel_trans_pred <- data.frame(
+  st = seq(min(BodyFat$st), max(BodyFat$st), length.out=100),
+  tc = seq(min(BodyFat$tc), max(BodyFat$tc), length.out=100)
+)
+sel_trans_pred$am = matrix(predict(sel_trans, expand.grid(sel_pred)),
+                      nrow=100, ncol=100)
+plot_ly() %>%
+  add_trace(x = BodyFat$st,
+            y = BodyFat$tc,
+            z = (BodyFat$am)^2,
+            type = "scatter3d",
+            mode = "markers",
+            marker = list(color = BodyFat$st+BodyFat$tc,
+                          colorscale = "Viridis")) %>%
+  add_surface(x = sel_trans_pred$st,
+              y = sel_trans_pred$tc,
+              z = sel_trans_pred$am,
+              colorscale = "Viridis",
+              opacity = 0.2,
+              contours = list(x = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              y = list(show = TRUE, color = "gray", width = 1, opacity = 0.3),
+                              z = list(show = TRUE, color = "gray", width = 1, opacity = 0.3))) %>%
+  layout(title = "Trabsformed linear model",
+         scene = list(xaxis = list(title = "Triarms skinfold thickness"),
+                      yaxis = list(title = "Thigh circumference"),
+                      zaxis = list(title = "Amount")))
+
+all_trans <- lm(I(am^2) ~ (st + tc + mc)^2, data = BodyFat)
+summary(all_trans)
+```
+
+The most probable $\lambda$ from Box-Cox is close to 2, and the 0.95 confidence interval includes 1. Instead of fitting with the transformation at the optimal $\lambda$, I will use $\lambda = 2$. This is because in addition to being a statistical process, this modeling exercise is also a scientific one and although I don't know much about the scientific model of this scenario, my intuition informs me that it ought be a whole number (Box and Cox themselves warn against simply taking the most probably $\lambda$ without considering the model implications). Examining the residual plot again, I am confident that the transformation improved the situation. It appears as if the plot forms a "U" shape, but I am believe that with more data to overcome the outlier (residual $\approx 150$) that the residual plot would take on the characteristic homoscedastic ellipse. Furthermore, the normal QQ plot and Shapiro-Wilkes test still indicate that the residuals are normally distributed. Even moreso, the adjusted $R^2$ has increased to 0.9561. For completeness, I also checked the adjusted $R^2$ of the transformed data with all predictors since for the transformed data had a higher $R^2$ with all predictors compared to selected predictors. I found this adjusted $R^2$ to be 0.9583, which despite being marginally higher to the point of being practically the same has very few significant factors. The model with selected parameters also has no codependence, fulfilling all of the linear model assumptions. So, I report the final model to be the transform with selected factors:
+
+$$
+(am)^2
+=
+-\left(1956.262 \pm 130.390\right) +
+\left(41.309 \pm 2.244\right) st +
+\left(18.747 \pm 2.673\right) tc +
+\epsilon;
+R^2 = 0.9607
+$$
+
+That is, the 96% of the variance in the square of the amount of body fat is explained by the triceps skin thickness and the thigh circumference.
+
+## Conclusions
+
+The model says the square of the amount of body fat increases linearly with the triceps skinfold thickness and thigh circumference, which makes a lot of sense. This preliminary analysis is promising. Being able to explain 96% of the variance in the response using the model parameters is a strong result that ought to be followed up, especially considering the many health implications of excessive and diminutive body fat.
+
+The most important improvement to the study in my opinion is to increase the sample size. Although the confidence intervals for the factors are reasonable, I would like to have more points in the residual vs fitted value scatter plot and normal QQ plot to better assess the homoscedasticity and normality assumptions. Being confident in the basic assumptions of linear regression is crucial if the model is to be trusted.
+
+My next recommendation would be to repeat the measurements over more than one age group. This would enable a two dimensional analysis where we look not only within individual age ranges, but also study how the relationship changes as women age. Doing a similar study using men is also a reasonable idea and could help us understand differences between the health of men and women.
+
+Finally, taking additional measurements could improve the explanatory power of the model. Taking stomach and chest measurements, as well as height and weight (the quantities necessary to compute BMI) could reveal more insights. However, since the model works so well, care must be taken to avoid over-fitting the data and reducing the significance of the results, or introducing co-dependence in the explanatory variables.
+
+A final note I'd like to include is that a brief attempt was made to use a generalized linear model of the Gamma family to model the data, since the amount of body fat is positive definite and it would not surprise me if the variance increased with increasing body fat. However, this did not work well, so it was abandoned in favor of the simple linear model of the Gaussian family.
