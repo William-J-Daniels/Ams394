@@ -118,7 +118,7 @@ sel_predi <- data.frame(
   st = seq(min(BodyFat$st), max(BodyFat$st), length.out=100),
   tc = seq(min(BodyFat$tc), max(BodyFat$tc), length.out=100)
 )
-sel_predi$am = matrix(predict(sel, expand.grid(sel_predi)),
+sel_predi$am = matrix(predict(seli, expand.grid(sel_predi)),
                       nrow=100, ncol=100)
 plot_ly() %>%
   add_trace(x = BodyFat$st,
